@@ -1,48 +1,42 @@
 <script>
     import { onMount } from "svelte";
 
-    let squares = [
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-        {
-            value: "",
-        },
-    ];
-
-    onMount(() => {
-        console.log("asdad");
-    });
+    let squares = ['','','','','','','','','']
 
     function addChoice(choice) {
-        console.log(choice);
-        squares[choice].value = "x";
+
+        squares[choice] = "x";
+
+        console.log(hasThreeConsecutiveDiagonal(squares))
+
     }
 
-    const handleClick = () => {
-        console.log("asd");
-    };
+    /**
+     * Revisa si hay 3 items que coinciden de forma diagonal
+     * @param arr
+     */
+    function hasThreeConsecutiveDiagonal(arr) {
+        // Check main diagonal (top-left to bottom-right)
+        let mainDiagonal = true;
+        for (let i = 1; i < arr.length; i++) {
+            if (arr[i][i] !== arr[0][0]) {
+                mainDiagonal = false;
+                break;
+            }
+        }
+
+        // Check secondary diagonal (top-right to bottom-left)
+        let secondaryDiagonal = true;
+        for (let i = 1; i < arr.length; i++) {
+            if (arr[i][arr.length - 1 - i] !== arr[0][arr.length - 1]) {
+                secondaryDiagonal = false;
+                break;
+            }
+        }
+
+        return mainDiagonal || secondaryDiagonal;
+    }
+
 </script>
 
 <section
@@ -53,7 +47,7 @@
             class="square border-black border-2"
             on:click={() => {
                 addChoice(i);
-            }}>{square.value}</button
+            }}>{square}</button
         >
     {/each}
 </section>
