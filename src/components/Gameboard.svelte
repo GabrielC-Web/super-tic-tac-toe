@@ -38,12 +38,22 @@
             return;
         }
 
+        //* Habilito el tablero para la siguiente jugada
         if (mainSquares[currentGameState.position] == "") {
             enabledBoard = currentGameState.position;
         }
 
+        //* Veo si el tablero habilitado realmente se puede jugar
+        while (mainSquares[enabledBoard] != "") {
+            if (enabledBoard + 1 <= 8) {
+                enabledBoard = enabledBoard + 1;
+            }
+
+            enabledBoard = 0;
+        }
+
         //* Cambia la jugada
-        // toggleNextMove();
+        toggleNextMove();
     }
 
     /**
