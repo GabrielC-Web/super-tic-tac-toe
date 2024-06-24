@@ -18,17 +18,29 @@
     let reset = false;
 
     /**
+     * Indica si el juego ha sido iniciado
+     */
+    let gameStarted = false;
+
+    /**
      * Setea las directrices para el próximo movimiento
      * @param event
      */
     function setBoard(event) {
+        //* Indico que el juego ha iniciado
         reset = false;
+        gameStarted = true;
 
+        //* Remuevo la clase de la animación inicial
+        setInitialAnimations();
+
+        //* Obtengo el estado del último tablero jugado
         currentGameState = event.detail.gameState;
 
         //* Revisa el ganador de algún tablero
         setWinnerBoard();
 
+        //* En caso de que haya un supermatch, termino el juego
         if (superBoardState?.win) {
             enabledBoard = 100;
 
@@ -47,9 +59,9 @@
         while (mainSquares[enabledBoard] != "") {
             if (enabledBoard + 1 <= 8) {
                 enabledBoard = enabledBoard + 1;
+            } else {
+                enabledBoard = 0;
             }
-
-            enabledBoard = 0;
         }
 
         //* Cambia la jugada
@@ -78,11 +90,16 @@
 
     function celebrationTime() {
         setTimeout(() => {
-            alert("¡Juego completado, ganan los:" + superBoardState.playerMove);
+            alert(
+                "¡Juego completado, ganan las: " + superBoardState.playerMove,
+            );
             resetGame();
         }, 500);
     }
 
+    /**
+     * Reseteo el juego
+     */
     function resetGame() {
         mainSquares = ["", "", "", "", "", "", "", "", ""];
 
@@ -94,12 +111,33 @@
 
         superBoardState = null;
 
+        gameStarted = false;
+
         reset = true;
+
+        //* Reinicio la animación
+        setInitialAnimations();
+    }
+
+    /**
+     * Agrega o elimina la animación inicial
+     */
+    function setInitialAnimations() {
+        if (reset) {
+            document.getElementById("main_grid").classList.add("appear");
+        } else {
+            document.getElementById("main_grid").classList.remove("appear");
+        }
     }
 </script>
 
+{#if !gameStarted}
+    <h1 id="main_title" class="main_title font-bold">¡Super Tic Tac Toe!</h1>
+{/if}
+
 <section
-    class="relative gameboard_grid flex h-full w-full max-h-[700px] max-w-[700px]"
+    id="main_grid"
+    class="relative gameboard_grid flex h-full w-full max-h-[700px] max-w-[700px] appear"
 >
     {#each mainSquares as mainSquare, i}
         <div class="border-4 border-black relative">
@@ -134,9 +172,45 @@
         font-size: 150px;
     }
 
+    .main_title {
+        position: absolute;
+        font-size: 50px;
+        animation-name: vanish;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+    }
+
+    .appear {
+        animation-name: appear;
+        animation-duration: 4s;
+    }
+
     @media (max-width: 620px) {
         .winner_move {
             font-size: 20vw;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .main_title {
+            font-size: 40px;
+        }
+    }
+
+    @keyframes appear {
+        from {
+            opacity: 0.5;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @keyframes vanish {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
         }
     }
 </style>
