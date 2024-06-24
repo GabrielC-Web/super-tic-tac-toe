@@ -1,6 +1,6 @@
 <script>
     import Grid from "../components/Grid.svelte";
-    import { onMount } from "svelte";
+    import hasMatch from "../services/services";
 
     let mainSquares = ["", "", "", "", "", "", "", "", ""];
 
@@ -10,16 +10,37 @@
 
     let currentGameState;
 
+    let superBoardState;
+
+    /**
+     * Indica si el juego ha sido reseteado
+     */
+    let reset = false;
+
     /**
      * Setea las directrices para el próximo movimiento
      * @param event
      */
     function setBoard(event) {
+        reset = false;
+
         currentGameState = event.detail.gameState;
 
+        //* Revisa el ganador de algún tablero
         setWinnerBoard();
 
-        enabledBoard = currentGameState.position;
+        if (superBoardState?.win) {
+            enabledBoard = 100;
+
+            //* Alerto la celebración
+            celebrationTime();
+
+            return;
+        }
+
+        if (mainSquares[currentGameState.position] == "") {
+            enabledBoard = currentGameState.position;
+        }
 
         //* Cambia la jugada
         // toggleNextMove();
@@ -39,8 +60,31 @@
     function setWinnerBoard() {
         if (currentGameState.win) {
             mainSquares[enabledBoard] = currentGameState.playerMove;
-            console.log(mainSquares);
+
+            //* Veo si hay un super match!
+            superBoardState = hasMatch(mainSquares, currentGameState.position);
         }
+    }
+
+    function celebrationTime() {
+        setTimeout(() => {
+            alert("¡Juego completado, ganan los:" + superBoardState.playerMove);
+            resetGame();
+        }, 500);
+    }
+
+    function resetGame() {
+        mainSquares = ["", "", "", "", "", "", "", "", ""];
+
+        enabledBoard = 0;
+
+        playerMove = "x";
+
+        currentGameState = null;
+
+        superBoardState = null;
+
+        reset = true;
     }
 </script>
 
@@ -55,10 +99,9 @@
             >
                 <span class="winner_move">{mainSquare}</span>
             </div>
-
             <Grid
                 position={i}
-                boardDisabled={mainSquare != ""}
+                {reset}
                 {enabledBoard}
                 {playerMove}
                 on:gameState={setBoard}
